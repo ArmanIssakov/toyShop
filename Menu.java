@@ -1,5 +1,8 @@
 import javax.swing.JOptionPane;
 
+/**
+ * Класс меню программы
+ */
 public class Menu {
 
     public void run(){
