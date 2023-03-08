@@ -1,5 +1,10 @@
 import javax.swing.JOptionPane;
+
+/**
+ * Класс меню программы
+ */
 public class Menu {
+
     public void run(){
         Model m=new Model();
         int choice=Integer.parseInt(JOptionPane.showInputDialog(null,
