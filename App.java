@@ -1,12 +1,11 @@
 /**
- * Класс запуска программы
+ * The main method instantiates a new object of the "Menu" class.
  */
 public class App {
 
 
     public static void main(String[] args) {
-        Menu m=new Menu();
-
-        m.run();
+        Menu menu = new Menu();
+        menu.run();
     }
 }
