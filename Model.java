@@ -3,9 +3,31 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Model implements ProgrammFunction{
+/**
+ * This is the beginning of the class definition for Model which implements ProgrammFunction.
+ * playLottery() method is an overridden method from the ProgrammFunction interface.
+ * Random is a class from java.util package which generates random numbers.
+ * forIdUser is a double variable initialized with a random decimal number between 0 and 1 multiplied by 1563.
+ * idUser is an integer variable casted from forIdUser.
+ * str is a String variable to read lines of text from a file.
+ * totalDropRate is a double variable initialized with zero.
+ * path2 is a File object referring to the "PRIZE-TOY.txt" file.
+ * bw is a BufferedWriter object initialized to write to the "PRIZE-TOY.txt" file.
+ * path is a File object referring to the "TOYWAREHOUSE.txt" file.
+ * br is a BufferedReader object initialized to read from the "TOYWAREHOUSE.txt" file.
+ * priorityArray is an ArrayList of String objects to store the text read from the "TOYWAREHOUSE.txt"
+ * file.
+ *
+ * A for loop is used to iterate through all the elements of priorityArray.
+ * secondArray is a String array initialized to hold the 4 sections of text separated by ";"
+ * from each element in priorityArray.
+ *
+ * If the fourth section of secondArray is 0, the corresponding element is removed from priorityArray.
+ * The second section of secondArray is added to totalDropRate.
+*/
 
-     @Override
+public class Model implements ProgrammFunction{
+    @Override
     public void playLottery(){
         Random random=new Random();
         double forIdUser=random.nextDouble()*1563;
@@ -13,7 +35,7 @@ public class Model implements ProgrammFunction{
         int idUser=(int)forIdUser;
 
         String str;
-        double totalDropRate=0;
+        final double[] totalDropRate = {0};
         try {
             File path2=new File("PRIZE-TOY.txt");
             BufferedWriter bw=new BufferedWriter(new FileWriter(path2,true));
@@ -26,17 +48,17 @@ public class Model implements ProgrammFunction{
             }
 
 
-            for (int j=0;j<priorityArray.size();j++){
-                String[] secondArray=new String[4];
-                secondArray=priorityArray.get(j).split(";");
-
-                if (Integer.parseInt(secondArray[3])==0){
-                    priorityArray.remove(j);
+            priorityArray.removeIf(s -> {
+                String[] secondArray = s.split(";");
+                if (Integer.parseInt(secondArray[3]) == 0) {
+                    return true;
+                } else {
+                    totalDropRate[0] += Double.parseDouble(secondArray[2]);
+                    return false;
                 }
-                totalDropRate+=Double.parseDouble(secondArray[2]);
-            }
+            });
 
-            double randomValue=random.nextDouble()*totalDropRate;
+            double randomValue=random.nextDouble()* totalDropRate[0];
             System.out.println(randomValue);
             double currentSum=0;
 
@@ -55,8 +77,8 @@ public class Model implements ProgrammFunction{
                                         +secondArray[3]));
 
                         JOptionPane.showMessageDialog(null,
-                                "Вы выйграли: "+secondArray[1]+"\nваш код выйгрыша: "+idUser,
-                                "Окно выйгрыша",
+                                "You won: "+secondArray[1]+"\nyour winning code: "+idUser,
+                                "Win window",
                                 JOptionPane.INFORMATION_MESSAGE);
 
                         bw.write(secondArray[0]+";"+secondArray[1]+";"+idUser);
@@ -99,8 +121,8 @@ public class Model implements ProgrammFunction{
     @Override
     public void changeWightChance() {
         int idToy = Integer.parseInt(JOptionPane.showInputDialog(null,
-                "Введите Id игрушки для изменения веса: ",
-                "Изменение веса игрушки",
+                "Enter the Id of the toy to change the weight: ",
+                "Changing the weight of the toy",
                 JOptionPane.INFORMATION_MESSAGE));
         String str;
         try {
@@ -117,10 +139,11 @@ public class Model implements ProgrammFunction{
                 secondArray = priorityArray.get(j).split(";");
                 if (idToy == Integer.parseInt(secondArray[0])) {
                     int weigthChance = Integer.parseInt(JOptionPane.showInputDialog(null,
-                            priorityArray.get(j) + "\nВведите новую величину веса в %: ",
-                            "Изменение веса игрушки",
+                            priorityArray.get(j) + "\nEnter a new weight value in %: ",
+                            "Changing the weight of the toy",
                             JOptionPane.INFORMATION_MESSAGE));
-                    String res = secondArray[0] + ";" + secondArray[1] + ";" + secondArray[2] + ";" + weigthChance;
+                    String res = secondArray[0] + ";" + secondArray[1] + ";" + secondArray[2] +
+                            ";" + weigthChance;
                     priorityArray.set(j, res);
                 }
             }
@@ -143,20 +166,20 @@ public class Model implements ProgrammFunction{
     public void addToy() {
 
         Toy toy=new Toy(Integer.parseInt(JOptionPane.showInputDialog(null,
-                "Введите id: ",
-                "Добавление игрушки",
+                "Enter id: ",
+                "Adding a toy",
                 JOptionPane.QUESTION_MESSAGE)),
                 JOptionPane.showInputDialog(null,
-                        "Введите наименование: ",
-                        "Добавление игрушки",
+                        "Enter a name: ",
+                        "Adding a toy",
                         JOptionPane.QUESTION_MESSAGE),
                 Integer.parseInt(JOptionPane.showInputDialog(null,
-                        "Введите количество:",
-                        "Добавление игрушек",
+                        "Enter quantity:",
+                        "Adding toys",
                         JOptionPane.QUESTION_MESSAGE)),
                 Integer.parseInt(JOptionPane.showInputDialog(null,
-                        "Введите вес в %: ",
-                        "Добавление игрушки",
+                        "Enter weight in %: ",
+                        "Adding a toy",
                         JOptionPane.QUESTION_MESSAGE)));
         try {
             File path=new File("TOYWAREHOUSE.txt");
@@ -166,24 +189,22 @@ public class Model implements ProgrammFunction{
             }
 
             BufferedWriter bw=new BufferedWriter(new FileWriter(path,true));
-
             bw.write(toy.getAllInfo());
-
             bw.newLine();
 
             JOptionPane.showMessageDialog(null,
-                    "Игрушка: \nid: "
-                            +toy.getId()+"\nназвание: "
-                            +toy.getToyName()+"\nколичество: "
-                            +toy.getCountOfToy()+"\nвес: "
-                            +toy.getWeigthChance()+"\nуспешно добавлена",
-                    "Сообщение",
+                    "Toy: \nid: "
+                            +toy.getId()+"\nname: "
+                            +toy.getToyName()+"\namount: "
+                            +toy.getCountOfToy()+"\nweight: "
+                            +toy.getWeigthChance()+"\nsuccessfully added",
+                    "Message",
                     JOptionPane.INFORMATION_MESSAGE);
-
             bw.close();
         }
         catch (IOException e){
-            JOptionPane.showMessageDialog(null,e,"Ошибка",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,e,"ERROR",
+                    JOptionPane.ERROR_MESSAGE);
         }
 
     }
@@ -191,8 +212,8 @@ public class Model implements ProgrammFunction{
     @Override
     public void getToy(){
         int idUser = Integer.parseInt(JOptionPane.showInputDialog(null,
-        "Введите Id участника: ",
-        "Выдача игрушки",
+        "Enter Member ID: ",
+        "Issuance of a toy",
         JOptionPane.INFORMATION_MESSAGE));
         String str;
         try {
@@ -210,8 +231,9 @@ public class Model implements ProgrammFunction{
                 secondArray = priorityArray.get(j).split(";");
                 if (idUser == Integer.parseInt(secondArray[2])) {
                     JOptionPane.showMessageDialog(null,
-                            "Поздравляем ваш выйгрыш\n" + secondArray[0] + "," + secondArray[1],
-                            "Выдача игрушки",
+                            "Congratulations on your win\n" + secondArray[0] + "," +
+                                    "" + secondArray[1],
+                            "Issuance of a toy",
                             JOptionPane.INFORMATION_MESSAGE);
 
                     priorityArray.remove(j);
